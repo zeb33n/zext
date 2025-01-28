@@ -8,10 +8,11 @@ typedef struct Screen {
   int width;
   int height;
   int font_size;
+  int cursor;
   char* text;
 } Screen;
 
-static Screen SCREEN = {0, 0, 0, 0, 0, NULL};
+static Screen SCREEN = {0, 0, 0, 0, 0, 0, NULL};
 
 void init(int w, int h, int font_size) {
   SCREEN.width_px = w;
@@ -30,15 +31,25 @@ void render_screen(void) {
   }
   for (int i = 0; i < SCREEN.height; i++) {
     for (int j = 0; j < SCREEN.width; j++) {
-      write_char((j * SCREEN.font_size) / 2, i * SCREEN.font_size,
-                 SCREEN.text[i + j], 0xEEEEEEEE, SCREEN.font_size);
+      write_char(
+          (j * SCREEN.font_size) / 2, i * SCREEN.font_size + SCREEN.font_size,
+          SCREEN.text[j + i * SCREEN.width], 0xEEEEEEEE, SCREEN.font_size);
     }
   }
 }
 
-void foo(void) {
-  for (int i = 0; i < SCREEN.height * SCREEN.width; i++) {
-    SCREEN.text[i] = 'g';
+void editor_keypress(char c) {
+  if (SCREEN.cursor == LEN_MAX - 1) {
+    return;
   }
+  SCREEN.text[SCREEN.cursor] = c;
+  SCREEN.cursor++;
   render_screen();
+}
+
+void foo(void) {
+  // for (int i = 0; i < SCREEN.height * SCREEN.width; i++) {
+  //   SCREEN.text[i] = 'g';
+  // }
+  // render_screen();
 }

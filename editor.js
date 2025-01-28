@@ -3,6 +3,7 @@
 
 let app = document.getElementById("app");
 let ctx = app.getContext("2d");
+let w = null;
 
 function color_hex(color) {
     const r = ((color>>(0*8))&0xFF).toString(16).padStart(2, '0');
@@ -24,16 +25,25 @@ function write_char(x, y, c, color, size) {
     ctx.fillText(character, x, y);
 }
 
+function log(msg) {
+    console.log(msg);
+}
 
 WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
     env: {
         fill_rect,
         write_char,
+        log,
     }
 }).then((w) => {
     w.instance.exports.init(app.width, app.height, 20);
     console.log(w.instance.exports);
     w.instance.exports.foo();
+
+    document.addEventListener("keydown", (c) =>  {
+      console.log(c);
+      w.instance.exports.editor_keypress(c.key.charCodeAt());
+    });
    }
 );
 
