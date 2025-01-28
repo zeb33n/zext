@@ -17,10 +17,10 @@ function fill_rect(x, y, w, h, color) {
     ctx.fillRect(x, y, w, h);
 }
 
-function write_char(x, y, c, color) {
+function write_char(x, y, c, color, size) {
     const character = String.fromCharCode(c);    
     ctx.fillStyle = color_hex(color);
-    // ctx.font = size + "px AnekLatin";
+    ctx.font = size + "px AnekLatin";
     ctx.fillText(character, x, y);
 }
 
@@ -31,6 +31,7 @@ WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
         write_char,
     }
 }).then((w) => {
+    w.instance.exports.init(app.width, app.height, 20);
     console.log(w.instance.exports);
     w.instance.exports.foo();
    }
