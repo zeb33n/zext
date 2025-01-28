@@ -17,10 +17,18 @@ function fill_rect(x, y, w, h, color) {
     ctx.fillRect(x, y, w, h);
 }
 
+function write_char(x, y, c, color) {
+    const character = String.fromCharCode(c);    
+    ctx.fillStyle = color_hex(color);
+    // ctx.font = size + "px AnekLatin";
+    ctx.fillText(character, x, y);
+}
+
 
 WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
     env: {
         fill_rect,
+        write_char,
     }
 }).then((w) => {
     console.log(w.instance.exports);
