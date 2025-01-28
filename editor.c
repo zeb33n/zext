@@ -26,17 +26,19 @@ void init(int w, int h, int font_size) {
 
 void render_screen(void) {
   if (SCREEN.text == NULL) {
-    // add some better error handling
     return;
   }
   for (int i = 0; i < SCREEN.height; i++) {
     for (int j = 0; j < SCREEN.width; j++) {
-      write_char((j * SCREEN.font_size) / 2, i * SCREEN.font_size, 'a',
-                 0xEEEEEEEE, SCREEN.font_size);
+      write_char((j * SCREEN.font_size) / 2, i * SCREEN.font_size,
+                 SCREEN.text[i + j], 0xEEEEEEEE, SCREEN.font_size);
     }
   }
 }
 
 void foo(void) {
+  for (int i = 0; i < SCREEN.height * SCREEN.width; i++) {
+    SCREEN.text[i] = 'g';
+  }
   render_screen();
 }
