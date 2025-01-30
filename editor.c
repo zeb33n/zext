@@ -1,6 +1,7 @@
 #include "editor.h"
 #define NULL (void*)0
 #define LEN_MAX 80 * 100
+#define CHAR_HW_R 1.5
 
 enum KeysSpecial {
   ENTER = 13,
@@ -21,16 +22,29 @@ typedef struct Screen {
   char* text;
 } Screen;
 
+static Screen SCREEN = {0, 0, 0, 0, 0, 0, NULL};
+
 typedef struct Coord {
   int x;
   int y;
 } Coord;
 
-static Screen SCREEN = {0, 0, 0, 0, 0, 0, NULL};
+Coord cursor_get_pos_cs() {
+  Coord out = {SCREEN.cursor % SCREEN.width_cs,
+               SCREEN.cursor / SCREEN.width_cs};
+  return out;
+}
 
-// CHECK thingy dont forget if num cahrs is bigger than len max
+Coord cursor_get_pos_px() {
+  Coord out = cursor_get_pos_cs();
+  out.x *= (SCREEN.font_size / CHAR_HW_R);
+  out.y *= SCREEN.font_size;
+  out.y += (SCREEN.font_size);
+  return out;
+}
+
 void init(int w, int h, int font_size) {
-  int w_chars = w / (font_size / 2);
+  int w_chars = w / (font_size / CHAR_HW_R);
   int h_chars = h / font_size;
   if (w_chars * h_chars > LEN_MAX) {
     return;
@@ -59,20 +73,6 @@ void render_screen(void) {
   }
 }
 
-Coord cursor_get_pos_cs() {
-  Coord out = {SCREEN.cursor % SCREEN.width_cs,
-               SCREEN.cursor / SCREEN.width_cs};
-  return out;
-}
-
-Coord cursor_get_pos_px() {
-  Coord out = cursor_get_pos_cs();
-  out.x *= (SCREEN.font_size / 2);
-  out.y *= SCREEN.font_size;
-  out.y += (SCREEN.font_size);
-  return out;
-}
-
 void execute_bspace() {
   if (SCREEN.cursor == 0) {
     return;
@@ -94,7 +94,7 @@ void editor_special_keypress(char c) {
 }
 
 void editor_keypress(char c) {
-  if (SCREEN.cursor == LEN_MAX - 1) {
+  if (SCREEN.cursor >= SCREEN.width_cs * SCREEN.height_cs) {
     return;
   }
   Coord cursor_coords = cursor_get_pos_px();
