@@ -10,7 +10,9 @@ void init(int w, int h, int font_size);
 
 #define NULL (void*)0
 #define LEN_MAX 80 * 100
-#define CHAR_HW_R 1.5
+#define FONT_HW_R 1.7
+// figure out a better way to calc this
+#define FONT_VP_PX 10 * FONT_HW_R
 
 enum KeysSpecial {
   ENTER = 13,

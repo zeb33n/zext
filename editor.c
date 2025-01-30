@@ -10,15 +10,15 @@ Coord cursor_get_pos_cs() {
 
 Coord cursor_get_pos_px() {
   Coord out = cursor_get_pos_cs();
-  out.x *= (SCREEN.font_size / CHAR_HW_R);
-  out.y *= SCREEN.font_size;
-  out.y += (SCREEN.font_size);
+  out.x *= (SCREEN.font_size / FONT_HW_R);
+  out.y *= (SCREEN.font_size + FONT_VP_PX);
+  out.y += SCREEN.font_size;
   return out;
 }
 
 void init(int w, int h, int font_size) {
-  int w_chars = w / (font_size / CHAR_HW_R);
-  int h_chars = h / font_size;
+  int w_chars = w / (font_size / FONT_HW_R);
+  int h_chars = h / (font_size + FONT_VP_PX);
   if (w_chars * h_chars > LEN_MAX) {
     return;
   }
