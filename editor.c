@@ -47,13 +47,14 @@ void execute_bspace() {
     return;
   }
   cursor_clear();
+
   SCREEN.cursor--;
   int line_end = cursor_get_line_end(SCREEN.cursor);
   for (int i = SCREEN.cursor - 1; i < line_end - 1; i++) {
     SCREEN.text[i] = SCREEN.text[i + 1];
   }
   SCREEN.text[line_end - 1] = 0;
-  // SCREEN.text[SCREEN.cursor] = ' ';
+
   cursor_render_line_from(SCREEN.cursor, cursor_get_line_end(SCREEN.cursor));
   cursor_render();
 }
@@ -92,16 +93,19 @@ void editor_special_keypress(char c) {
   }
 }
 
+// TODO what to do when we push text off screen?
 void editor_keypress(char c) {
   if (SCREEN.cursor >= SCREEN.width_cs * SCREEN.height_cs) {
     return;
   }
   cursor_clear();
   int line_end = cursor_get_line_end(SCREEN.cursor);
+
   for (int i = line_end - 1; i > SCREEN.cursor; i--) {
     SCREEN.text[i] = SCREEN.text[i - 1];
   }
   SCREEN.text[SCREEN.cursor] = c;
+
   cursor_render_line_from(SCREEN.cursor, line_end);
   SCREEN.cursor++;
   cursor_render();
