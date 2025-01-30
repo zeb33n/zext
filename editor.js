@@ -58,7 +58,6 @@ WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
 
     document.addEventListener("keydown", (c) =>  {
       if (c.key.length > 1) {
-        console.log(c.keyCode);
         w.instance.exports.editor_special_keypress(c.keyCode);
       } else {
         w.instance.exports.editor_keypress(c.key.charCodeAt());
