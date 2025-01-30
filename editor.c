@@ -1,33 +1,6 @@
 #include "editor.h"
-#define NULL (void*)0
-#define LEN_MAX 80 * 100
-#define CHAR_HW_R 1.5
-
-enum KeysSpecial {
-  ENTER = 13,
-  UP = 38,
-  DOWN = 40,
-  BSPACE = 8,
-  DELETE = 46,
-  TAB = 9,
-};
-
-typedef struct Screen {
-  int width_px;
-  int height_px;
-  int width_cs;
-  int height_cs;
-  int font_size;
-  int cursor;
-  char* text;
-} Screen;
 
 static Screen SCREEN = {0, 0, 0, 0, 0, 0, NULL};
-
-typedef struct Coord {
-  int x;
-  int y;
-} Coord;
 
 Coord cursor_get_pos_cs() {
   Coord out = {SCREEN.cursor % SCREEN.width_cs,
