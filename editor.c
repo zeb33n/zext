@@ -44,7 +44,7 @@ void cursor_clear() {
             SCREEN.font_px, BGRD_COL);
 }
 
-void init(int w, int h, int font_size) {
+void editor_init(int w, int h, int font_size) {
   // Check if size is ok
   int w_chars = w / (font_size / FONT_HW_R);
   int h_chars = h / (font_size + FONT_VP_PX);
@@ -131,11 +131,4 @@ void editor_keypress(char c) {
   SCREEN.text[SCREEN.cursor] = c;
   SCREEN.cursor++;
   cursor_render();
-}
-
-void foo(void) {
-  // for (int i = 0; i < SCREEN.height * SCREEN.width; i++) {
-  //   SCREEN.text[i] = 'g';
-  // }
-  // render_screen();
 }

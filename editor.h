@@ -3,10 +3,9 @@ void write_char(int x, int y, unsigned char c, unsigned int color, int size);
 void unwrite_char(int x, int y, unsigned int color, int size);
 void log(int msg);
 
-void foo(void);
 void editor_keypress(char c);
 void editor_special_keypress(char c);
-void init(int w, int h, int font_size);
+void editor_init(int w, int h, int font_size);
 
 #define NULL (void*)0
 #define LEN_MAX 80 * 100

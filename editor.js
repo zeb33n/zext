@@ -53,9 +53,8 @@ WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
         unwrite_char,
     }
 }).then((w) => {
-    w.instance.exports.init(app.width, app.height, 100);
+    w.instance.exports.editor_init(app.width, app.height, 100);
     console.log(w.instance.exports);
-    w.instance.exports.foo();
 
     document.addEventListener("keydown", (c) =>  {
       if (c.key.length > 1) {
