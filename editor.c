@@ -15,15 +15,14 @@ Coord cursor_get_pos_px(int pos) {
   return out;
 }
 
-void cursor_render_line_from(int cur_pos) {
-  int line_end = SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
-  for (int i = cur_pos; i < line_end; i++) {
-    log(i);
-    char c = SCREEN.text[i];
-    if (c == 0) {
-      log(69);
-      return;
-    }
+int cursor_get_line_end(int cur_pos) {
+  return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
+}
+
+void cursor_render_line_from(int cur_pos, int line_end) {
+  char c = ' ';
+  for (int i = cur_pos; i < line_end && c != 0; i++) {
+    c = SCREEN.text[i];
     Coord write_pos = cursor_get_pos_px(i);
     unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
     write_char(write_pos.x, write_pos.y, c, TEXT_COL, SCREEN.font_px);
@@ -42,16 +41,20 @@ void cursor_clear() {
             SCREEN.font_px, BGRD_COL);
 }
 
+// make sure delete fills the end with 0s
 void execute_bspace() {
   if (SCREEN.cursor == 0) {
     return;
   }
   cursor_clear();
   SCREEN.cursor--;
-  // Coord cursor_coords = cursor_get_pos_px(SCREEN.cursor);
-  // unwrite_char(cursor_coords.x, cursor_coords.y, BGRD_COL, SCREEN.font_px);
-  SCREEN.text[SCREEN.cursor] = ' ';
-  cursor_render_line_from(SCREEN.cursor);
+  int line_end = cursor_get_line_end(SCREEN.cursor);
+  for (int i = SCREEN.cursor - 1; i < line_end - 1; i++) {
+    SCREEN.text[i] = SCREEN.text[i + 1];
+  }
+  SCREEN.text[line_end - 1] = 0;
+  // SCREEN.text[SCREEN.cursor] = ' ';
+  cursor_render_line_from(SCREEN.cursor, cursor_get_line_end(SCREEN.cursor));
   cursor_render();
 }
 
@@ -94,10 +97,12 @@ void editor_keypress(char c) {
     return;
   }
   cursor_clear();
-  // Coord cursor_coords = cursor_get_pos_px(SCREEN.cursor);
-  // write_char(cursor_coords.x, cursor_coords.y, c, TEXT_COL, SCREEN.font_px);
+  int line_end = cursor_get_line_end(SCREEN.cursor);
+  for (int i = line_end - 1; i > SCREEN.cursor; i--) {
+    SCREEN.text[i] = SCREEN.text[i - 1];
+  }
   SCREEN.text[SCREEN.cursor] = c;
-  cursor_render_line_from(SCREEN.cursor);
+  cursor_render_line_from(SCREEN.cursor, line_end);
   SCREEN.cursor++;
   cursor_render();
 }
