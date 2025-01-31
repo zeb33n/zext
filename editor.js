@@ -41,6 +41,19 @@ function cstrlen(mem, ptr) {
     return len;
 }
 
+function cstr_by_ptr(mem_buffer, ptr) {
+    const mem = new Uint8Array(mem_buffer);
+    const len = cstrlen(mem, ptr);
+    const bytes = new Uint8Array(mem_buffer, ptr, len);
+    return new TextDecoder().decode(bytes);
+}
+
+function log_str(msg) {
+    const buffer = w.instance.exports.memory.buffer;
+    const message = cstr_by_ptr(buffer, msg);
+    console.log(message);
+}
+
 function log(msg) {
     console.log(msg);
 }
@@ -50,9 +63,11 @@ WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
         fill_rect,
         write_char,
         log,
+        log_str,
         unwrite_char,
     }
-}).then((w) => {
+}).then((wasm) => {
+    w = wasm;
     w.instance.exports.editor_init(app.width, app.height, 100);
     console.log(w.instance.exports);
 

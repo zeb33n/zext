@@ -103,6 +103,13 @@ void execute_right() {
   cursor_render();
 }
 
+// TODO export function for use in js
+void dump_text() {
+  for (int i = 0; i < SCREEN.height_cs; i++) {
+    log_str(&(SCREEN.text[i * SCREEN.width_cs]));
+  }
+}
+
 // TODO what to do when text is pushed off screen.
 // we need to think about scrolling.
 void execute_enter() {
@@ -110,22 +117,22 @@ void execute_enter() {
   int current_line = SCREEN.cursor / SCREEN.width_cs;
   for (int line = SCREEN.height_cs - 1; line > current_line + 1; line--) {
     int line_ind = line * SCREEN.width_cs;
+    line_clear_from(line_ind);
     // copy lines
-    for (int i = 0; i <= SCREEN.width_cs; i++) {
+    for (int i = 0; i < SCREEN.width_cs; i++) {
       int from_ind = (line_ind - SCREEN.width_cs) + i;
       int to_ind = line_ind + i;
       SCREEN.text[to_ind] = SCREEN.text[from_ind];
     }
-    line_clear_from(line_ind);
-    log(line_ind);
     line_render_from(line_ind);
   }
+  // dump_text();
   // special case for the last line
   line_clear_from(SCREEN.cursor);
   int current_line_end = line_get_end(SCREEN.cursor);
   int next_line_ind = (current_line + 1) * SCREEN.width_cs;
-  line_empty_from(next_line_ind);
   line_clear_from(next_line_ind);
+  line_empty_from(next_line_ind);
   for (int i = 0; i < current_line_end - SCREEN.cursor; i++) {
     if (SCREEN.text[i + SCREEN.cursor] == 0) {
       break;
@@ -136,6 +143,7 @@ void execute_enter() {
   line_render_from(next_line_ind);
   SCREEN.cursor = next_line_ind;
   cursor_render();
+  dump_text();
 }
 
 // PUBLIC FUNCS !
