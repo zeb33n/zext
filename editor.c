@@ -2,44 +2,70 @@
 
 static Screen SCREEN = {0, 0, 0, 0, 0, 0, 0, 0, NULL};
 
-Coord cursor_get_pos_cs(int pos) {
+// CURSOR !
+
+Coord cursor_get_coord_cs(int pos) {
   Coord out = {pos % SCREEN.width_cs, pos / SCREEN.width_cs};
   return out;
 }
 
-Coord cursor_get_pos_px(int pos) {
-  Coord out = cursor_get_pos_cs(pos);
+Coord cursor_get_coord_px(int pos) {
+  Coord out = cursor_get_coord_cs(pos);
   out.x *= SCREEN.cursor_x_os;
   out.y *= SCREEN.cursor_y_os;
   out.y += SCREEN.font_px;
   return out;
 }
 
-int cursor_get_line_end(int cur_pos) {
-  return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
-}
-
-void cursor_render_line_from(int cur_pos, int line_end) {
-  char c = ' ';
-  for (int i = cur_pos; i < line_end && c != 0; i++) {
-    c = SCREEN.text[i];
-    Coord write_pos = cursor_get_pos_px(i);
-    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
-    write_char(write_pos.x, write_pos.y, c, TEXT_COL, SCREEN.font_px);
-  }
-}
-
 void cursor_render() {
-  Coord cursor_coords = cursor_get_pos_px(SCREEN.cursor);
+  Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
   fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
             SCREEN.font_px, TEXT_COL);
 }
 
 void cursor_clear() {
-  Coord cursor_coords = cursor_get_pos_px(SCREEN.cursor);
+  Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
   fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
             SCREEN.font_px, BGRD_COL);
 }
+
+// Line !
+
+int line_get_end(int cur_pos) {
+  return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
+}
+
+void line_empty_from(int cur_pos) {
+  int line_end = line_get_end(cur_pos);
+  for (int i = cur_pos; i < line_end; i++) {
+    if (SCREEN.text[i] == 0)
+      break;
+    SCREEN.text[i] = 0;
+  }
+}
+
+void line_clear_from(int cur_pos) {
+  int line_end = line_get_end(cur_pos);
+  for (int i = cur_pos; i < line_end; i++) {
+    if (SCREEN.text[i] == 0)
+      break;
+    Coord write_pos = cursor_get_coord_px(i);
+    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
+  }
+}
+
+void line_render_from(int cur_pos) {
+  int line_end = line_get_end(cur_pos);
+  char c = ' ';
+  for (int i = cur_pos; i < line_end && c != 0; i++) {
+    c = SCREEN.text[i];
+    Coord write_pos = cursor_get_coord_px(i);
+    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
+    write_char(write_pos.x, write_pos.y, c, TEXT_COL, SCREEN.font_px);
+  }
+}
+
+// SPECIAL KEYS !
 
 // make sure delete fills the end with 0s
 void execute_bspace() {
@@ -49,13 +75,13 @@ void execute_bspace() {
   cursor_clear();
 
   SCREEN.cursor--;
-  int line_end = cursor_get_line_end(SCREEN.cursor);
+  int line_end = line_get_end(SCREEN.cursor);
   for (int i = SCREEN.cursor - 1; i < line_end - 1; i++) {
     SCREEN.text[i] = SCREEN.text[i + 1];
   }
   SCREEN.text[line_end - 1] = 0;
 
-  cursor_render_line_from(SCREEN.cursor, cursor_get_line_end(SCREEN.cursor));
+  line_render_from(SCREEN.cursor);
   cursor_render();
 }
 
@@ -77,6 +103,22 @@ void execute_right() {
   cursor_render();
 }
 
+// TODO what to do when text is pushed off screen.
+// we need to think about scrolling.
+void execute_enter() {
+  cursor_clear();
+  int current_line = SCREEN.cursor / SCREEN.width_cs;
+  for (int line = SCREEN.height_cs - 1; line > current_line; line--) {
+    int line_ind = line * SCREEN.width_cs;
+    for (int i = 0; i <= SCREEN.width_cs; i++) {
+      SCREEN.text[line_ind + i] = SCREEN.text[(line_ind - SCREEN.width_cs) + i];
+    }
+    line_render_from(line_ind);
+  }
+}
+
+// PUBLIC FUNCS !
+
 void editor_special_keypress(char c) {
   switch (c) {
     case BSPACE:
@@ -87,6 +129,9 @@ void editor_special_keypress(char c) {
       return;
     case RIGHT:
       execute_right();
+      return;
+    case ENTER:
+      execute_enter();
       return;
     default:
       return;
@@ -99,14 +144,14 @@ void editor_keypress(char c) {
     return;
   }
   cursor_clear();
-  int line_end = cursor_get_line_end(SCREEN.cursor);
+  int line_end = line_get_end(SCREEN.cursor);
 
   for (int i = line_end - 1; i > SCREEN.cursor; i--) {
     SCREEN.text[i] = SCREEN.text[i - 1];
   }
   SCREEN.text[SCREEN.cursor] = c;
 
-  cursor_render_line_from(SCREEN.cursor, line_end);
+  line_render_from(SCREEN.cursor);
   SCREEN.cursor++;
   cursor_render();
 }
@@ -131,6 +176,7 @@ void editor_init(int w, int h, int font_size) {
   SCREEN.cursor_y_os = font_size + FONT_VP_PX;
 
   // allocate and initialise text buffer
+  // TODO add one extra 0 delimited column to the text
   static char text[LEN_MAX];
   SCREEN.text = text;
   for (int i = 0; i < LEN_MAX; i++) {

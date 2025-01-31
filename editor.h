@@ -17,6 +17,7 @@ void editor_init(int w, int h, int font_size);
 #define TEXT_COL 0xEEEEEEEE
 
 enum KeysSpecial {
+  TAB = 9,
   ENTER = 13,
   LEFT = 37,
   UP = 38,
@@ -24,7 +25,6 @@ enum KeysSpecial {
   DOWN = 40,
   BSPACE = 8,
   DELETE = 46,
-  TAB = 9,
 };
 
 typedef struct Screen {
