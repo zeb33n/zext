@@ -108,13 +108,34 @@ void execute_right() {
 void execute_enter() {
   cursor_clear();
   int current_line = SCREEN.cursor / SCREEN.width_cs;
-  for (int line = SCREEN.height_cs - 1; line > current_line; line--) {
+  for (int line = SCREEN.height_cs - 1; line > current_line + 1; line--) {
     int line_ind = line * SCREEN.width_cs;
+    // copy lines
     for (int i = 0; i <= SCREEN.width_cs; i++) {
-      SCREEN.text[line_ind + i] = SCREEN.text[(line_ind - SCREEN.width_cs) + i];
+      int from_ind = (line_ind - SCREEN.width_cs) + i;
+      int to_ind = line_ind + i;
+      SCREEN.text[to_ind] = SCREEN.text[from_ind];
     }
+    line_clear_from(line_ind);
+    log(line_ind);
     line_render_from(line_ind);
   }
+  // special case for the last line
+  line_clear_from(SCREEN.cursor);
+  int current_line_end = line_get_end(SCREEN.cursor);
+  int next_line_ind = (current_line + 1) * SCREEN.width_cs;
+  line_empty_from(next_line_ind);
+  line_clear_from(next_line_ind);
+  for (int i = 0; i < current_line_end - SCREEN.cursor; i++) {
+    if (SCREEN.text[i + SCREEN.cursor] == 0) {
+      break;
+    }
+    SCREEN.text[next_line_ind + i] = SCREEN.text[i + SCREEN.cursor];
+    SCREEN.text[i + SCREEN.cursor] = 0;
+  }
+  line_render_from(next_line_ind);
+  SCREEN.cursor = next_line_ind;
+  cursor_render();
 }
 
 // PUBLIC FUNCS !
