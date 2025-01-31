@@ -31,7 +31,6 @@ void cursor_clear() {
 
 // Line !
 
-// TODO SHOULD return an error if line end is oob?!
 int line_get_end(int cur_pos) {
   return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
 }
@@ -76,15 +75,15 @@ void line_render_from(int cur_pos) {
   }
 }
 
-int line_get_str_end(int cur_pos) {
-  int i = line_get_end(cur_pos);
+// SPECIAL KEYS !
+
+// TODO only ever go up one string or bad error is going to get you
+int get_next_line_end_str(int i) {
   while (SCREEN.text[i] == 0) {
     i--;
   }
   return i + 1;
 }
-
-// SPECIAL KEYS !
 
 void execute_bspace() {
   if (SCREEN.cursor == 0) {
@@ -109,15 +108,10 @@ void execute_left() {
   }
   cursor_clear();
   if (SCREEN.cursor % SCREEN.width_cs == 0) {
-    int i = SCREEN.cursor - 1;
-    while (SCREEN.text[i] == 0) {
-      i--;
-    }
-    SCREEN.cursor = i + 1;
+    SCREEN.cursor = get_next_line_end_str(SCREEN.cursor - 1);
   } else {
     SCREEN.cursor--;
   }
-  log(SCREEN.cursor);
   cursor_render();
 }
 
