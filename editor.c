@@ -31,6 +31,7 @@ void cursor_clear() {
 
 // Line !
 
+// TODO SHOULD return an error if line end is oob?!
 int line_get_end(int cur_pos) {
   return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
 }
@@ -51,6 +52,16 @@ void line_clear_from(int cur_pos) {
       break;
     Coord write_pos = cursor_get_coord_px(i);
     unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
+  }
+}
+
+void line_copy(int from_pos, int to_pos) {
+  if (to_pos + SCREEN.width_cs >= LEN_MAX ||
+      from_pos + SCREEN.width_cs >= LEN_MAX) {
+    return;
+  }
+  for (int i = 0; i < SCREEN.width_cs; i++) {
+    SCREEN.text[to_pos + i] = SCREEN.text[from_pos + i];
   }
 }
 
@@ -113,26 +124,29 @@ void dump_text() {
 // TODO what to do when text is pushed off screen.
 // we need to think about scrolling.
 void execute_enter() {
-  cursor_clear();
   int current_line = SCREEN.cursor / SCREEN.width_cs;
+  int current_line_end = line_get_end(SCREEN.cursor);
+  int next_line_ind = (current_line + 1) * SCREEN.width_cs;
+  if (next_line_ind >= SCREEN.width_cs * SCREEN.height_cs) {
+    return;
+  }
+  cursor_clear();
+
+  // copy lines from the end of the screen
+  // TODO only copy last defined line +1 -> only have to iterate over the first
+  // index of each line from the bottom and check if its 0
   for (int line = SCREEN.height_cs - 1; line > current_line + 1; line--) {
     int line_ind = line * SCREEN.width_cs;
     line_clear_from(line_ind);
-    // copy lines
-    for (int i = 0; i < SCREEN.width_cs; i++) {
-      int from_ind = (line_ind - SCREEN.width_cs) + i;
-      int to_ind = line_ind + i;
-      SCREEN.text[to_ind] = SCREEN.text[from_ind];
-    }
+    line_copy(line_ind - SCREEN.width_cs, line_ind);
     line_render_from(line_ind);
   }
-  // dump_text();
-  // special case for the last line
+
+  // special case for the line where the key was pressed
   line_clear_from(SCREEN.cursor);
-  int current_line_end = line_get_end(SCREEN.cursor);
-  int next_line_ind = (current_line + 1) * SCREEN.width_cs;
   line_clear_from(next_line_ind);
   line_empty_from(next_line_ind);
+
   for (int i = 0; i < current_line_end - SCREEN.cursor; i++) {
     if (SCREEN.text[i + SCREEN.cursor] == 0) {
       break;
@@ -140,10 +154,10 @@ void execute_enter() {
     SCREEN.text[next_line_ind + i] = SCREEN.text[i + SCREEN.cursor];
     SCREEN.text[i + SCREEN.cursor] = 0;
   }
+
   line_render_from(next_line_ind);
   SCREEN.cursor = next_line_ind;
   cursor_render();
-  dump_text();
 }
 
 // PUBLIC FUNCS !
