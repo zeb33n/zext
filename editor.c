@@ -76,9 +76,16 @@ void line_render_from(int cur_pos) {
   }
 }
 
+int line_get_str_end(int cur_pos) {
+  int i = line_get_end(cur_pos);
+  while (SCREEN.text[i] == 0) {
+    i--;
+  }
+  return i + 1;
+}
+
 // SPECIAL KEYS !
 
-// make sure delete fills the end with 0s
 void execute_bspace() {
   if (SCREEN.cursor == 0) {
     return;
@@ -101,7 +108,16 @@ void execute_left() {
     return;
   }
   cursor_clear();
-  SCREEN.cursor--;
+  if (SCREEN.cursor % SCREEN.width_cs == 0) {
+    int i = SCREEN.cursor - 1;
+    while (SCREEN.text[i] == 0) {
+      i--;
+    }
+    SCREEN.cursor = i + 1;
+  } else {
+    SCREEN.cursor--;
+  }
+  log(SCREEN.cursor);
   cursor_render();
 }
 
@@ -110,16 +126,18 @@ void execute_right() {
     return;
   }
   cursor_clear();
-  SCREEN.cursor++;
+  if (SCREEN.text[SCREEN.cursor] == 0) {
+    SCREEN.cursor = line_get_end(SCREEN.cursor);
+  } else {
+    SCREEN.cursor++;
+  }
+  log(SCREEN.cursor);
   cursor_render();
 }
 
-// TODO export function for use in js
-void dump_text() {
-  for (int i = 0; i < SCREEN.height_cs; i++) {
-    log_str(&(SCREEN.text[i * SCREEN.width_cs]));
-  }
-}
+void execute_down() {}
+
+void execute_up() {}
 
 // TODO what to do when text is pushed off screen.
 // we need to think about scrolling.
@@ -162,6 +180,12 @@ void execute_enter() {
 
 // PUBLIC FUNCS !
 
+void editor_dump_text() {
+  for (int i = 0; i < SCREEN.height_cs; i++) {
+    log_str(&(SCREEN.text[i * SCREEN.width_cs]));
+  }
+}
+
 void editor_special_keypress(char c) {
   switch (c) {
     case BSPACE:
@@ -175,6 +199,12 @@ void editor_special_keypress(char c) {
       return;
     case ENTER:
       execute_enter();
+      return;
+    case UP:
+      execute_up();
+      return;
+    case DOWN:
+      execute_down();
       return;
     default:
       return;

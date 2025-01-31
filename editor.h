@@ -7,6 +7,7 @@ void log_str(char* msg);
 void editor_keypress(char c);
 void editor_special_keypress(char c);
 void editor_init(int w, int h, int font_size);
+void editor_dump_text();
 
 #define NULL (void*)0
 #define LEN_MAX 80 * 100
