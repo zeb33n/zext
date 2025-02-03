@@ -46,7 +46,15 @@ void cursor_mov_lr(int d) {
 }
 
 void cursor_mov_ud(int d) {
-  int line_end = line_get_end(SCREEN.cursor);
+  int line = SCREEN.cursor / SCREEN.width_cs;
+  if ((line == 0 && d < 0) || (line == SCREEN.height_cs - 1 && d > 0)) {
+    return;
+  }
+  int new_cur_pos = SCREEN.cursor + d * SCREEN.width_cs;
+  if (SCREEN.text[new_cur_pos] == 0 || SCREEN.text[SCREEN.cursor] == 0) {
+    new_cur_pos = line_next_end_str(new_cur_pos);
+  }
+  SCREEN.cursor = new_cur_pos;
 }
 
 // Line !
@@ -141,9 +149,17 @@ void execute_right() {
   cursor_render();
 }
 
-void execute_down() {}
+void execute_down() {
+  cursor_clear();
+  cursor_mov_ud(1);
+  cursor_render();
+}
 
-void execute_up() {}
+void execute_up() {
+  cursor_clear();
+  cursor_mov_ud(-1);
+  cursor_render();
+}
 
 // TODO what to do when text is pushed off screen.
 // we need to think about scrolling.
