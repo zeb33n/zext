@@ -29,7 +29,35 @@ void cursor_clear() {
             SCREEN.font_px, BGRD_COL);
 }
 
+void cursor_mov_lr(int d) {
+  // if cursor is at the edge of the editors space
+  if ((SCREEN.cursor == 0 && d < 0) ||
+      (SCREEN.cursor >= SCREEN.width_cs * SCREEN.height_cs && d > 0)) {
+    return;
+    // if cursor is at the end of a line of text
+  } else if (SCREEN.text[SCREEN.cursor] == 0 && d > 0) {
+    SCREEN.cursor = line_get_end(SCREEN.cursor);
+    // if cursor is at the start of a line
+  } else if (SCREEN.cursor % SCREEN.width_cs == 0 && d < 0) {
+    SCREEN.cursor = line_next_end_str(SCREEN.cursor - 1);
+  } else {
+    SCREEN.cursor += d;
+  }
+}
+
+void cursor_mov_ud(int d) {
+  int line_end = line_get_end(SCREEN.cursor);
+}
+
 // Line !
+
+// TODO only ever go up one string or bad error is going to get you
+int line_next_end_str(int i) {
+  while (SCREEN.text[i] == 0) {
+    i--;
+  }
+  return i + 1;
+}
 
 int line_get_end(int cur_pos) {
   return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
@@ -77,20 +105,12 @@ void line_render_from(int cur_pos) {
 
 // SPECIAL KEYS !
 
-// TODO only ever go up one string or bad error is going to get you
-int get_next_line_end_str(int i) {
-  while (SCREEN.text[i] == 0) {
-    i--;
-  }
-  return i + 1;
-}
-
+// TODO delete lines
 void execute_bspace() {
   if (SCREEN.cursor == 0) {
     return;
   }
   cursor_clear();
-
   SCREEN.cursor--;
   int line_end = line_get_end(SCREEN.cursor);
   for (int i = SCREEN.cursor - 1; i < line_end - 1; i++) {
@@ -102,16 +122,13 @@ void execute_bspace() {
   cursor_render();
 }
 
+// cursor kinda has one more position per line than the characters
 void execute_left() {
   if (SCREEN.cursor == 0) {
     return;
   }
   cursor_clear();
-  if (SCREEN.cursor % SCREEN.width_cs == 0) {
-    SCREEN.cursor = get_next_line_end_str(SCREEN.cursor - 1);
-  } else {
-    SCREEN.cursor--;
-  }
+  cursor_mov_lr(-1);
   cursor_render();
 }
 
@@ -120,12 +137,7 @@ void execute_right() {
     return;
   }
   cursor_clear();
-  if (SCREEN.text[SCREEN.cursor] == 0) {
-    SCREEN.cursor = line_get_end(SCREEN.cursor);
-  } else {
-    SCREEN.cursor++;
-  }
-  log(SCREEN.cursor);
+  cursor_mov_lr(1);
   cursor_render();
 }
 
@@ -145,8 +157,8 @@ void execute_enter() {
   cursor_clear();
 
   // copy lines from the end of the screen
-  // TODO only copy last defined line +1 -> only have to iterate over the first
-  // index of each line from the bottom and check if its 0
+  // TODO only copy last defined line +1 -> only have to iterate over the
+  // first index of each line from the bottom and check if its 0
   for (int line = SCREEN.height_cs - 1; line > current_line + 1; line--) {
     int line_ind = line * SCREEN.width_cs;
     line_clear_from(line_ind);
