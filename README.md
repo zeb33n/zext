@@ -11,4 +11,4 @@ The size of the text relative to the window is also customisable using the font 
 ## TODO for v1.0
 - javascript/runtime config
 - text linting interface
-- 0 known bugs
+- clipboard support
