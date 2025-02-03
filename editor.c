@@ -253,11 +253,20 @@ void editor_keypress(char c) {
   cursor_render();
 }
 
+int count_digits(int i) {
+  int count = 0;
+  while (i) {
+    i /= 10;
+    count++;
+  }
+  return count;
+}
+
 void editor_init(int w, int h, int font_size) {
   // Check if size is ok
   int vert_pad_px = font_size / 4;
   int h_cs = h / (font_size + vert_pad_px);
-  int margin_w_cs = h_cs / 10 + 2;
+  int margin_w_cs = count_digits(h_cs) + 1;
   int w_cs = (w / (font_size / FONT_HW_R)) - margin_w_cs;
   if (w_cs * h_cs > LEN_MAX) {
     return;
@@ -287,11 +296,13 @@ void editor_init(int w, int h, int font_size) {
   write_char(0, font_size, '0', TEXT_COL_MARGIN, font_size);
   for (int i = 0; i < h_cs; i++) {
     int num = i;
+    int x = count_digits(num) - 1;
     while (num) {
       char c = num % 10 + 0x30;
       num /= 10;
-      write_char(num * SCREEN.cursor_x_os, i * SCREEN.cursor_y_os + font_size,
-                 c, TEXT_COL_MARGIN, font_size);
+      write_char(x * SCREEN.cursor_x_os, i * SCREEN.cursor_y_os + font_size, c,
+                 TEXT_COL_MARGIN, font_size);
+      x--;
     }
   }
   cursor_render();
