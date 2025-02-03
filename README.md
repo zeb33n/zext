@@ -4,7 +4,8 @@ A very lightweight, customisable text editor designed for performance whilst emb
 ## configuration
 All colours are configurable (currently this is only possible at compile time). 
 ![image](https://github.com/user-attachments/assets/4cac784c-50db-472a-995c-69b7600c88bc)
-![image](https://github.com/user-attachments/assets/31e023db-3545-4698-b2ba-3aeda3fcb6cf)
+![image](https://github.com/user-attachments/assets/718e4c93-aae7-4220-96b0-cd910f7d8d3e)
+
 
 The size of the text relative to the window is also customisable using the font size arg to the `editor_init` function.
 
