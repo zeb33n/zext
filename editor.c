@@ -1,6 +1,6 @@
 #include "editor.h"
 
-static Screen SCREEN = {0, 0, 0, 0, 0, 0, 0, 0, NULL};
+static Screen SCREEN = {0, 0, 0, 0, 0, 0, 0, NULL};
 
 // CURSOR !
 
@@ -12,6 +12,7 @@ Coord cursor_get_coord_cs(int pos) {
 Coord cursor_get_coord_px(int pos) {
   Coord out = cursor_get_coord_cs(pos);
   out.x *= SCREEN.cursor_x_os;
+  out.x += SCREEN.margin_w_cs * SCREEN.cursor_x_os;
   out.y *= SCREEN.cursor_y_os;
   out.y += SCREEN.font_px;
   return out;
@@ -60,6 +61,7 @@ void cursor_mov_ud(int d) {
 // Line !
 
 // TODO only ever go up one string or bad error is going to get you
+// JUST rework this function in general
 int line_next_end_str(int i) {
   while (SCREEN.text[i] == 0) {
     i--;
@@ -253,17 +255,17 @@ void editor_keypress(char c) {
 
 void editor_init(int w, int h, int font_size) {
   // Check if size is ok
-  int w_chars = w / (font_size / FONT_HW_R);
-  int h_chars = h / (font_size + FONT_VP_PX);
-  if (w_chars * h_chars > LEN_MAX) {
+  int h_cs = h / (font_size + FONT_VP_PX);
+  int margin_w_cs = h_cs / 10 + 2;
+  int w_cs = (w / (font_size / FONT_HW_R)) - margin_w_cs;
+  if (w_cs * h_cs > LEN_MAX) {
     return;
   }
 
   // Set basic parameters
-  SCREEN.width_px = w;
-  SCREEN.height_px = h;
-  SCREEN.width_cs = w_chars;
-  SCREEN.height_cs = h_chars;
+  SCREEN.width_cs = w_cs;
+  SCREEN.height_cs = h_cs;
+  SCREEN.margin_w_cs = margin_w_cs;
 
   // Calibrate font size and spacings
   SCREEN.font_px = font_size;
@@ -280,5 +282,16 @@ void editor_init(int w, int h, int font_size) {
 
   // initial rendering
   fill_rect(0, 0, w, h, BGRD_COL);
+  fill_rect(0, 0, margin_w_cs * SCREEN.cursor_x_os, h, BGRD_COL_MARGIN);
+  write_char(0, font_size, '0', TEXT_COL_MARGIN, font_size);
+  for (int i = 0; i < h_cs; i++) {
+    int num = i;
+    while (num) {
+      char c = num % 10 + 0x30;
+      num /= 10;
+      write_char(num * SCREEN.cursor_x_os, i * SCREEN.cursor_y_os + font_size,
+                 c, TEXT_COL_MARGIN, font_size);
+    }
+  }
   cursor_render();
 }
