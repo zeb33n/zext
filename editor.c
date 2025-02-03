@@ -123,7 +123,7 @@ void execute_bspace() {
   cursor_clear();
   SCREEN.cursor--;
   int line_end = line_get_end(SCREEN.cursor);
-  for (int i = SCREEN.cursor - 1; i < line_end - 1; i++) {
+  for (int i = SCREEN.cursor; i < line_end - 1; i++) {
     SCREEN.text[i] = SCREEN.text[i + 1];
   }
   SCREEN.text[line_end - 1] = 0;
