@@ -15,10 +15,10 @@ void editor_dump_text();
 #define NULL (void*)0
 #define LEN_MAX 80 * 100
 #define FONT_HW_R 1.7
-#define BGRD_COL 0xFF181818
-#define TEXT_COL 0xEEEEEEEE
-#define TEXT_COL_MARGIN 0xDDDDDDDD
-#define BGRD_COL_MARGIN 0xCCCCCCCC
+#define BGRD_COL 0xFF101C01
+#define TEXT_COL 0xFF526937
+#define TEXT_COL_MARGIN 0xFF101C01
+#define BGRD_COL_MARGIN 0xFF526937
 
 // INTERNAL DECLARATIONS
 enum KeysSpecial {
