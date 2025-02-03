@@ -255,7 +255,8 @@ void editor_keypress(char c) {
 
 void editor_init(int w, int h, int font_size) {
   // Check if size is ok
-  int h_cs = h / (font_size + FONT_VP_PX);
+  int vert_pad_px = font_size / 4;
+  int h_cs = h / (font_size + vert_pad_px);
   int margin_w_cs = h_cs / 10 + 2;
   int w_cs = (w / (font_size / FONT_HW_R)) - margin_w_cs;
   if (w_cs * h_cs > LEN_MAX) {
@@ -270,7 +271,7 @@ void editor_init(int w, int h, int font_size) {
   // Calibrate font size and spacings
   SCREEN.font_px = font_size;
   SCREEN.cursor_x_os = font_size / FONT_HW_R;
-  SCREEN.cursor_y_os = font_size + FONT_VP_PX;
+  SCREEN.cursor_y_os = font_size + vert_pad_px;
 
   // allocate and initialise text buffer
   // TODO add one extra 0 delimited column to the text

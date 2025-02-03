@@ -15,7 +15,6 @@ void editor_dump_text();
 #define NULL (void*)0
 #define LEN_MAX 80 * 100
 #define FONT_HW_R 1.7
-#define FONT_VP_PX 10 * FONT_HW_R
 #define BGRD_COL 0xFF181818
 #define TEXT_COL 0xEEEEEEEE
 #define TEXT_COL_MARGIN 0xDDDDDDDD
