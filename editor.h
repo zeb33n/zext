@@ -49,4 +49,4 @@ typedef struct Coord {
 } Coord;
 
 int line_get_end(int cur_pos);
-int line_next_end_str(int i);
+int line_get_end_str(int cur_pos);

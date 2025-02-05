@@ -40,7 +40,7 @@ void cursor_mov_lr(int d) {
     SCREEN.cursor = line_get_end(SCREEN.cursor);
     // if cursor is at the start of a line
   } else if (SCREEN.cursor % SCREEN.width_cs == 0 && d < 0) {
-    SCREEN.cursor = line_next_end_str(SCREEN.cursor - 1);
+    SCREEN.cursor = line_get_end_str(SCREEN.cursor - 1);
   } else {
     SCREEN.cursor += d;
   }
@@ -53,20 +53,21 @@ void cursor_mov_ud(int d) {
   }
   int new_cur_pos = SCREEN.cursor + d * SCREEN.width_cs;
   if (SCREEN.text[new_cur_pos] == 0 || SCREEN.text[SCREEN.cursor] == 0) {
-    new_cur_pos = line_next_end_str(new_cur_pos);
+    new_cur_pos = line_get_end_str(new_cur_pos);
   }
   SCREEN.cursor = new_cur_pos;
 }
 
 // Line !
 
-// TODO only ever go up one string or bad error is going to get you
-// JUST rework this function in general
-int line_next_end_str(int i) {
-  while (SCREEN.text[i] == 0) {
-    i--;
+int line_get_end_str(int cur_pos) {
+  while (SCREEN.text[cur_pos] == 0) {
+    cur_pos--;
   }
-  return i + 1;
+  while (SCREEN.text[cur_pos] != 0) {
+    cur_pos++;
+  }
+  return cur_pos;
 }
 
 int line_get_end(int cur_pos) {
@@ -116,12 +117,9 @@ void line_render_from(int cur_pos) {
 // SPECIAL KEYS !
 
 // TODO delete lines
-void execute_bspace() {
-  if (SCREEN.cursor == 0) {
-    return;
-  }
+void bspace_normal() {
   cursor_clear();
-  SCREEN.cursor--;
+  cursor_mov_lr(-1);
   int line_end = line_get_end(SCREEN.cursor);
   for (int i = SCREEN.cursor; i < line_end - 1; i++) {
     SCREEN.text[i] = SCREEN.text[i + 1];
@@ -132,20 +130,41 @@ void execute_bspace() {
   cursor_render();
 }
 
-// cursor kinda has one more position per line than the characters
-void execute_left() {
+void bspace_linestart() {
+  cursor_clear();
+  int current_line = SCREEN.cursor / SCREEN.width_cs;
+  if (current_line == 0) {
+    return;
+  }
+  // int current_line_end = line_get_end(SCREEN.cursor);
+  // int prev_line_ind = (current_line - 1) * SCREEN.width_cs;
+  // if (prev_line_ind == 0) {
+  //   return;
+  // }
+  // copy line from cursor into previous line from str end
+  // copy previous lines
+  // null line to end
+}
+
+void execute_bspace() {
   if (SCREEN.cursor == 0) {
     return;
   }
+  if (SCREEN.cursor % SCREEN.width_cs == 0) {
+    bspace_linestart();
+  } else {
+    bspace_normal();
+  }
+}
+
+// cursor kinda has one more position per line than the characters
+void execute_left() {
   cursor_clear();
   cursor_mov_lr(-1);
   cursor_render();
 }
 
 void execute_right() {
-  if (SCREEN.cursor >= SCREEN.width_cs * SCREEN.height_cs) {
-    return;
-  }
   cursor_clear();
   cursor_mov_lr(1);
   cursor_render();
