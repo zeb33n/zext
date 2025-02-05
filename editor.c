@@ -136,14 +136,31 @@ void bspace_linestart() {
   if (current_line == 0) {
     return;
   }
-  // int current_line_end = line_get_end(SCREEN.cursor);
-  // int prev_line_ind = (current_line - 1) * SCREEN.width_cs;
-  // if (prev_line_ind == 0) {
-  //   return;
-  // }
-  // copy line from cursor into previous line from str end
-  // copy previous lines
-  // null line to end
+
+  cursor_mov_lr(-1);
+  int prev_line_end = line_get_end(SCREEN.cursor);
+
+  for (int i = 0; i < prev_line_end - SCREEN.cursor; i++) {
+    if (SCREEN.text[i + prev_line_end] == 0) {
+      break;
+    }
+    SCREEN.text[i + SCREEN.cursor] = SCREEN.text[prev_line_end + i];
+  }
+  line_render_from(SCREEN.cursor);
+
+  int last_line_start = (SCREEN.height_cs - 1) * SCREEN.width_cs;
+  line_clear_from(last_line_start);
+  line_empty_from(last_line_start);
+  line_render_from(last_line_start);
+
+  for (int line = current_line; line < SCREEN.height_cs - 1; line++) {
+    int line_ind = line * SCREEN.width_cs;
+    line_clear_from(line_ind);
+    line_copy(line_ind + SCREEN.width_cs, line_ind);
+    line_render_from(line_ind);
+  }
+  cursor_render();
+  editor_dump_text();
 }
 
 void execute_bspace() {
