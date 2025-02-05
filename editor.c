@@ -61,6 +61,10 @@ void cursor_mov_ud(int d) {
 // Line !
 
 int line_get_end_str(int cur_pos) {
+  int line_start = line_get_end(cur_pos) - SCREEN.width_cs;
+  if (SCREEN.text[line_start] == 0) {
+    return line_start;
+  }
   while (SCREEN.text[cur_pos] == 0) {
     cur_pos--;
   }
