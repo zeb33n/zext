@@ -4,7 +4,7 @@ A very lightweight, customisable text editor designed for performance whilst emb
 simply clone the project and run a the repo as a static site. 
 ```
 git clone https://github.com/zeb33n/zext.git
-python -m http.server 6969
+cd zext && python -m http.server 6969
 ```
 Then using your browser navigate to localhost:6969 and enjoy!
 ## configuration (Make it Zexy!)
