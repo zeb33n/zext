@@ -1,3 +1,6 @@
+#ifndef EDITOR_H
+#define EDITOR_H
+
 // IMPORTS
 void fill_rect(int x, int y, int w, int h, unsigned int colour);
 void write_char(int x, int y, unsigned char c, unsigned int color, int size);
@@ -50,3 +53,8 @@ typedef struct Coord {
 
 int line_get_end(int cur_pos);
 int line_get_end_str(int cur_pos);
+Coord cursor_get_coord_px(int pos);
+
+static Screen SCREEN;  // hack for global -> should probably make its own file
+
+#endif

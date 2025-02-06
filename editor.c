@@ -2,125 +2,9 @@
 
 static Screen SCREEN = {0, 0, 0, 0, 0, 0, 0, NULL};
 
-// CURSOR !
+#include "cursor.c"
+#include "line.c"
 
-Coord cursor_get_coord_cs(int pos) {
-  Coord out = {pos % SCREEN.width_cs, pos / SCREEN.width_cs};
-  return out;
-}
-
-Coord cursor_get_coord_px(int pos) {
-  Coord out = cursor_get_coord_cs(pos);
-  out.x *= SCREEN.cursor_x_os;
-  out.x += SCREEN.margin_w_cs * SCREEN.cursor_x_os;
-  out.y *= SCREEN.cursor_y_os;
-  out.y += SCREEN.font_px;
-  return out;
-}
-
-void cursor_render() {
-  Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
-  fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
-            SCREEN.font_px, TEXT_COL);
-}
-
-void cursor_clear() {
-  Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
-  fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
-            SCREEN.font_px, BGRD_COL);
-}
-
-void cursor_mov_lr(int d) {
-  // if cursor is at the edge of the editors space
-  if ((SCREEN.cursor == 0 && d < 0) ||
-      (SCREEN.cursor >= SCREEN.width_cs * SCREEN.height_cs && d > 0)) {
-    return;
-    // if cursor is at the end of a line of text
-  } else if (SCREEN.text[SCREEN.cursor] == 0 && d > 0) {
-    SCREEN.cursor = line_get_end(SCREEN.cursor);
-    // if cursor is at the start of a line
-  } else if (SCREEN.cursor % SCREEN.width_cs == 0 && d < 0) {
-    SCREEN.cursor = line_get_end_str(SCREEN.cursor - 1);
-  } else {
-    SCREEN.cursor += d;
-  }
-}
-
-void cursor_mov_ud(int d) {
-  int line = SCREEN.cursor / SCREEN.width_cs;
-  if ((line == 0 && d < 0) || (line == SCREEN.height_cs - 1 && d > 0)) {
-    return;
-  }
-  int new_cur_pos = SCREEN.cursor + d * SCREEN.width_cs;
-  if (SCREEN.text[new_cur_pos] == 0 || SCREEN.text[SCREEN.cursor] == 0) {
-    new_cur_pos = line_get_end_str(new_cur_pos);
-  }
-  SCREEN.cursor = new_cur_pos;
-}
-
-// Line !
-
-int line_get_end_str(int cur_pos) {
-  int line_start = line_get_end(cur_pos) - SCREEN.width_cs;
-  if (SCREEN.text[line_start] == 0) {
-    return line_start;
-  }
-  while (SCREEN.text[cur_pos] == 0) {
-    cur_pos--;
-  }
-  while (SCREEN.text[cur_pos] != 0) {
-    cur_pos++;
-  }
-  return cur_pos;
-}
-
-int line_get_end(int cur_pos) {
-  return SCREEN.width_cs * (cur_pos / SCREEN.width_cs + 1);
-}
-
-void line_empty_from(int cur_pos) {
-  int line_end = line_get_end(cur_pos);
-  for (int i = cur_pos; i < line_end; i++) {
-    if (SCREEN.text[i] == 0)
-      break;
-    SCREEN.text[i] = 0;
-  }
-}
-
-void line_clear_from(int cur_pos) {
-  int line_end = line_get_end(cur_pos);
-  for (int i = cur_pos; i < line_end; i++) {
-    if (SCREEN.text[i] == 0)
-      break;
-    Coord write_pos = cursor_get_coord_px(i);
-    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
-  }
-}
-
-void line_copy(int from_pos, int to_pos) {
-  if (to_pos + SCREEN.width_cs >= LEN_MAX ||
-      from_pos + SCREEN.width_cs >= LEN_MAX) {
-    return;
-  }
-  for (int i = 0; i < SCREEN.width_cs; i++) {
-    SCREEN.text[to_pos + i] = SCREEN.text[from_pos + i];
-  }
-}
-
-void line_render_from(int cur_pos) {
-  int line_end = line_get_end(cur_pos);
-  char c = ' ';
-  for (int i = cur_pos; i < line_end && c != 0; i++) {
-    c = SCREEN.text[i];
-    Coord write_pos = cursor_get_coord_px(i);
-    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
-    write_char(write_pos.x, write_pos.y, c, TEXT_COL, SCREEN.font_px);
-  }
-}
-
-// SPECIAL KEYS !
-
-// TODO delete lines
 void bspace_normal() {
   cursor_clear();
   cursor_mov_lr(-1);
@@ -152,19 +36,19 @@ void bspace_linestart() {
   }
   line_render_from(SCREEN.cursor);
 
-  int last_line_start = (SCREEN.height_cs - 1) * SCREEN.width_cs;
-  line_clear_from(last_line_start);
-  line_empty_from(last_line_start);
-  line_render_from(last_line_start);
-
   for (int line = current_line; line < SCREEN.height_cs - 1; line++) {
     int line_ind = line * SCREEN.width_cs;
     line_clear_from(line_ind);
     line_copy(line_ind + SCREEN.width_cs, line_ind);
     line_render_from(line_ind);
   }
+
+  int last_line_start = (SCREEN.height_cs - 1) * SCREEN.width_cs;
+  line_clear_from(last_line_start);
+  line_empty_from(last_line_start);
+  line_render_from(last_line_start);
+
   cursor_render();
-  editor_dump_text();
 }
 
 void execute_bspace() {
@@ -215,8 +99,6 @@ void execute_enter() {
   cursor_clear();
 
   // copy lines from the end of the screen
-  // TODO only copy last defined line +1 -> only have to iterate over the
-  // first index of each line from the bottom and check if its 0
   for (int line = SCREEN.height_cs - 1; line > current_line + 1; line--) {
     int line_ind = line * SCREEN.width_cs;
     line_clear_from(line_ind);
