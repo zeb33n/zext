@@ -1,3 +1,6 @@
+#ifndef EDITOR_H
+#define EDITOR_H
+
 // IMPORTS
 void fill_rect(int x, int y, int w, int h, unsigned int colour);
 void write_char(int x, int y, unsigned char c, unsigned int color, int size);
@@ -48,5 +51,23 @@ typedef struct Coord {
   int y;
 } Coord;
 
+// line
 int line_get_end(int cur_pos);
 int line_get_end_str(int cur_pos);
+void line_clear_from(int cur_pos);
+void line_render_from(int cur_pos);
+void line_empty_from(int cur_pos);
+void line_copy(int from_pos, int to_pos);
+
+// cursor
+Coord cursor_get_coord_px(int pos);
+void cursor_clear();
+void cursor_mov_lr(int d);
+void cursor_render();
+void cursor_mov_ud(int d);
+
+// hack for global -> should probably make its own file with getters and
+// setters.
+static Screen SCREEN;
+
+#endif
