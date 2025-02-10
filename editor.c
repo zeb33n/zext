@@ -38,6 +38,7 @@ void editor_special_keypress(char c) {
 }
 
 // TODO what to do when we push text off screen?
+// rewrite with cursor functions
 void editor_keypress(char c) {
   if (SCREEN.cursor >= SCREEN.width_cs * SCREEN.height_cs) {
     return;
