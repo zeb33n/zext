@@ -68,7 +68,9 @@ function get_text(msg) {
     return message;
 }
 
-WebAssembly.instantiateStreaming(fetch('editor.wasm'), {
+const wasm_path = new URL('editor.wasm', import.meta.url);
+
+WebAssembly.instantiateStreaming(fetch(wasm_path), {
     env: {
         js_fill_rect,
         js_write_char,
