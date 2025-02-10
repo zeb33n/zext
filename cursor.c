@@ -16,14 +16,14 @@ Coord cursor_get_coord_px(int pos) {
 
 void cursor_render() {
   Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
-  fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
-            SCREEN.font_px, TEXT_COL);
+  js_fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
+               SCREEN.font_px, TEXT_COL);
 }
 
 void cursor_clear() {
   Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
-  fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
-            SCREEN.font_px, BGRD_COL);
+  js_fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
+               SCREEN.font_px, BGRD_COL);
 }
 
 void cursor_mov_lr(int d) {

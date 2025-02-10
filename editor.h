@@ -2,11 +2,12 @@
 #define EDITOR_H
 
 // IMPORTS
-void fill_rect(int x, int y, int w, int h, unsigned int colour);
-void write_char(int x, int y, unsigned char c, unsigned int color, int size);
-void unwrite_char(int x, int y, unsigned int color, int size);
-void log(int msg);
-void log_str(char* msg);
+void js_fill_rect(int x, int y, int w, int h, unsigned int colour);
+void js_write_char(int x, int y, unsigned char c, unsigned int color, int size);
+void js_unwrite_char(int x, int y, unsigned int color, int size);
+void js_log(int msg);
+void js_log_str(char* msg);
+void js_dump_line(char* msg);
 
 // EXPORTS
 void editor_keypress(char c);

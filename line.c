@@ -33,7 +33,7 @@ void line_clear_from(int cur_pos) {
     if (SCREEN.text[i] == 0)
       break;
     Coord write_pos = cursor_get_coord_px(i);
-    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
+    js_unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
   }
 }
 
@@ -53,7 +53,7 @@ void line_render_from(int cur_pos) {
   for (int i = cur_pos; i < line_end && c != 0; i++) {
     c = SCREEN.text[i];
     Coord write_pos = cursor_get_coord_px(i);
-    unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
-    write_char(write_pos.x, write_pos.y, c, TEXT_COL, SCREEN.font_px);
+    js_unwrite_char(write_pos.x, write_pos.y, BGRD_COL, SCREEN.font_px);
+    js_write_char(write_pos.x, write_pos.y, c, TEXT_COL, SCREEN.font_px);
   }
 }

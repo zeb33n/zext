@@ -8,7 +8,7 @@ static Screen SCREEN = {0, 0, 0, 0, 0, 0, 0, NULL};
 
 void editor_dump_text() {
   for (int i = 0; i < SCREEN.height_cs; i++) {
-    log_str(&(SCREEN.text[i * SCREEN.width_cs]));
+    js_dump_line(&(SCREEN.text[i * SCREEN.width_cs]));
   }
 }
 
@@ -94,17 +94,17 @@ void editor_init(int w, int h, int font_size) {
   }
 
   // initial rendering
-  fill_rect(0, 0, w, h, BGRD_COL);
-  fill_rect(0, 0, margin_w_cs * SCREEN.cursor_x_os, h, BGRD_COL_MARGIN);
-  write_char(0, font_size, '0', TEXT_COL_MARGIN, font_size);
+  js_fill_rect(0, 0, w, h, BGRD_COL);
+  js_fill_rect(0, 0, margin_w_cs * SCREEN.cursor_x_os, h, BGRD_COL_MARGIN);
+  js_write_char(0, font_size, '0', TEXT_COL_MARGIN, font_size);
   for (int i = 0; i < h_cs; i++) {
     int num = i;
     int x = count_digits(num) - 1;
     while (num) {
       char c = num % 10 + 0x30;
       num /= 10;
-      write_char(x * SCREEN.cursor_x_os, i * SCREEN.cursor_y_os + font_size, c,
-                 TEXT_COL_MARGIN, font_size);
+      js_write_char(x * SCREEN.cursor_x_os, i * SCREEN.cursor_y_os + font_size,
+                    c, TEXT_COL_MARGIN, font_size);
       x--;
     }
   }

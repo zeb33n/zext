@@ -11,7 +11,7 @@
       src: url(fonts/AnekLatin-Light.ttf);
     }
 
-    #app {
+    #zext {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -20,11 +20,21 @@
       touch-action: none;
     }
   </style>
+
+  <script type="module">
+    import {zext_dump_text} from "./zext.js"
+    function get_text() {
+      alert(zext_dump_text());
+    }
+    document.getElementById("btn").addEventListener("click", get_text);
+  </script>
+
 </head>
 
+
 <body>
-  <canvas id="app" width=1600 height=900></canvas>
-  <script src="editor.js"></script>
+  <button id="btn">get text!</button>
+  <canvas id="zext" width=1600 height=900, tabindex='1'></canvas>
 </body>
 
 </html>
