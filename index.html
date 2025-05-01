@@ -17,12 +17,14 @@
       left: 50%;
       transform: translate(-50%, -50%);
       height: 100%;
-      touch-action: none;
+      touch-ction: none;
     }
   </style>
 
   <script type="module">
-    import {zext_dump_text} from "./zext.js"
+    import {zext_dump_text, zext_init, zext_set_colours} from "./zext.js"
+    zext_set_colours("FFFFFF", "548588", "3c38a", "548588") 
+    zext_init();
     function get_text() {
       alert(zext_dump_text());
     }
