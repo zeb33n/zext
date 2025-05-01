@@ -16,7 +16,7 @@ All colours are configurable (currently this is only possible at compile time by
 The size of the text relative to the window is also customisable using the font size arg to the `editor_init` function.
 
 ## TODO for v1.0
-- javascript/runtime config
+- javascript/runtime config ✅
 - text linting interface
 - clipboard support
 - Easy embedding interface

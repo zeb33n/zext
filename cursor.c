@@ -17,13 +17,13 @@ Coord cursor_get_coord_px(int pos) {
 void cursor_render() {
   Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
   js_fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
-               SCREEN.font_px, TEXT_COL);
+               SCREEN.font_px, SCREEN.colours.txt);
 }
 
 void cursor_clear() {
   Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
   js_fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,
-               SCREEN.font_px, BGRD_COL);
+               SCREEN.font_px, SCREEN.colours.bgrd);
 }
 
 void cursor_mov_lr(int d) {

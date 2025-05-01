@@ -1,6 +1,9 @@
 #include "editor.h"
 
-static Screen SCREEN = {0, 0, 0, 0, 0, 0, 0, NULL};
+static Screen SCREEN = {
+    0, 0,    0,
+    0, 0,    0,
+    0, NULL, {BGRD_COL, TEXT_COL, BGRD_COL_MARGIN, TEXT_COL_MARGIN}};
 
 #include "cursor.c"
 #include "keys.c"
@@ -65,6 +68,14 @@ int count_digits(int i) {
   return count;
 }
 
+void editor_set_colours(int bgrd, int txt, int bgrd_margin, int txt_margin) {
+  js_log_str("hello from in here");
+  SCREEN.colours.bgrd = bgrd;
+  SCREEN.colours.txt = txt;
+  SCREEN.colours.bgrd_margin = bgrd_margin;
+  SCREEN.colours.txt_margin = txt_margin;
+}
+
 void editor_init(int w, int h, int font_size) {
   // Check if size is ok
   int vert_pad_px = font_size / 4;
@@ -94,9 +105,10 @@ void editor_init(int w, int h, int font_size) {
   }
 
   // initial rendering
-  js_fill_rect(0, 0, w, h, BGRD_COL);
-  js_fill_rect(0, 0, margin_w_cs * SCREEN.cursor_x_os, h, BGRD_COL_MARGIN);
-  js_write_char(0, font_size, '0', TEXT_COL_MARGIN, font_size);
+  js_fill_rect(0, 0, w, h, SCREEN.colours.bgrd);
+  js_fill_rect(0, 0, margin_w_cs * SCREEN.cursor_x_os, h,
+               SCREEN.colours.bgrd_margin);
+  js_write_char(0, font_size, '0', SCREEN.colours.txt_margin, font_size);
   for (int i = 0; i < h_cs; i++) {
     int num = i;
     int x = count_digits(num) - 1;
@@ -104,7 +116,7 @@ void editor_init(int w, int h, int font_size) {
       char c = num % 10 + 0x30;
       num /= 10;
       js_write_char(x * SCREEN.cursor_x_os, i * SCREEN.cursor_y_os + font_size,
-                    c, TEXT_COL_MARGIN, font_size);
+                    c, SCREEN.colours.txt_margin, font_size);
       x--;
     }
   }
