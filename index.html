@@ -1,8 +1,7 @@
 <html>
-
-<head>
-  <style>
-    body {
+  <head>
+    <style>
+      body {
       overflow-y: hidden;
     }
 
@@ -19,24 +18,20 @@
       height: 100%;
       touch-ction: none;
     }
-  </style>
-
-  <script type="module">
-    import {zext_dump_text, zext_init, zext_set_colours} from "./zext.js"
-    zext_set_colours("FFFFFF", "548588", "3c38a", "548588") 
+    </style>
+    <script type="module">
+      import {zext_dump_text, zext_init, zext_set_colours} from "./zext.js"
+    // TODO check colours are as expected
+    zext_set_colours("2e302b", "548588", "2e302b", "548588") 
     zext_init();
     function get_text() {
       alert(zext_dump_text());
     }
     document.getElementById("btn").addEventListener("click", get_text);
-  </script>
-
-</head>
-
-
-<body>
-  <button id="btn">get text!</button>
-  <canvas id="zext" width=1600 height=900, tabindex='1'></canvas>
-</body>
-
+    </script>
+  </head>
+  <body>
+    <button id="btn">get text!</button>
+    <canvas id="zext" width=1600  height=900,  tabindex='1'></canvas>
+  </body>
 </html>
