@@ -83,6 +83,8 @@ w = await WebAssembly.instantiateStreaming(fetch(wasm_path), {
 
 export function zext_init() {
     w.instance.exports.editor_init(app.width, app.height, 90);
+
+    // keypress
     app.addEventListener("keydown", (c) =>  {
       if (c.key.length > 1) {
         w.instance.exports.editor_special_keypress(c.keyCode);
@@ -90,6 +92,8 @@ export function zext_init() {
         w.instance.exports.editor_keypress(c.key.charCodeAt());
       }
     });
+
+    // clicking
     app.addEventListener("click", (e) => {
         const rect = app.getBoundingClientRect();
         // Convert viewport coords -> canvas coords
@@ -99,6 +103,11 @@ export function zext_init() {
         const y = (e.clientY - rect.top) * scaleY;
 
         w.instance.exports.editor_click(x, y);
+    });
+
+    // mouse over
+    app.addEventListener("mousemove", (_) => {
+        app.style.cursor = "text";
     });
 }
 
