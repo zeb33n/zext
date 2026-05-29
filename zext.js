@@ -90,6 +90,16 @@ export function zext_init() {
         w.instance.exports.editor_keypress(c.key.charCodeAt());
       }
     });
+    app.addEventListener("click", (e) => {
+        const rect = app.getBoundingClientRect();
+        // Convert viewport coords -> canvas coords
+        const scaleX = app.width / rect.width;
+        const scaleY = app.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
+
+        w.instance.exports.editor_click(x, y);
+    });
 }
 
 export function zext_dump_text() {

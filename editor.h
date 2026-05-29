@@ -11,6 +11,7 @@ void js_dump_line(char* msg);
 
 // EXPORTS
 void editor_keypress(char c);
+void editor_click(int x, int y);
 void editor_special_keypress(char c);
 void editor_init(int w, int h, int font_size);
 void editor_dump_text();
@@ -75,6 +76,7 @@ void cursor_clear();
 void cursor_mov_lr(int d);
 void cursor_render();
 void cursor_mov_ud(int d);
+void cursor_set_pos(Coord pos_px);
 
 // hack for global -> should probably make its own file with getters and
 // setters.

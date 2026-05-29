@@ -14,6 +14,19 @@ Coord cursor_get_coord_px(int pos) {
   return out;
 }
 
+// TODO use coord
+void cursor_set_pos(Coord pos_px) {
+  cursor_clear();
+  int cursor_x_cs =
+      (pos_px.x - SCREEN.margin_w_cs * SCREEN.cursor_x_os) / SCREEN.cursor_x_os;
+  int cursor_y_cs = pos_px.y / SCREEN.cursor_y_os;
+  SCREEN.cursor = cursor_y_cs * SCREEN.width_cs + cursor_x_cs;
+  if (SCREEN.text[SCREEN.cursor] == 0) {
+    SCREEN.cursor = line_get_end_str(SCREEN.cursor);
+  }
+  cursor_render();
+}
+
 void cursor_render() {
   Coord cursor_coords = cursor_get_coord_px(SCREEN.cursor);
   js_fill_rect(cursor_coords.x, cursor_coords.y - (SCREEN.font_px / 1.2), 4,

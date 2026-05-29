@@ -59,6 +59,11 @@ void editor_keypress(char c) {
   cursor_render();
 }
 
+void editor_click(int x, int y) {
+  Coord pos_px = {x, y};
+  cursor_set_pos(pos_px);
+}
+
 int count_digits(int i) {
   int count = 0;
   while (i) {
